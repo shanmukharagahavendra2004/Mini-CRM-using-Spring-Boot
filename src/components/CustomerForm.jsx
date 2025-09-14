@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
-
 const CustomerForm = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -21,7 +19,7 @@ const CustomerForm = () => {
         setError("");
         try {
           const token = localStorage.getItem("token");
-          const res = await axios.get(`${API_URL}/api/customers/${id}`, {
+          const res = await axios.get(`http://localhost:5000/api/customers/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           const customer = res.data;
@@ -46,12 +44,12 @@ const CustomerForm = () => {
 
     try {
       if (id) {
-        await axios.put(`${API_URL}/api/customers/${id}`, customer, {
+        await axios.put(`http://localhost:5000/api/customers/${id}`, customer, {
           headers: { Authorization: `Bearer ${token}` },
         });
         alert("Customer updated successfully");
       } else {
-        await axios.post(`${API_URL}/api/customers`, customer, {
+        await axios.post("http://localhost:5000/api/customers", customer, {
           headers: { Authorization: `Bearer ${token}` },
         });
         alert("Customer added successfully");

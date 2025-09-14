@@ -3,7 +3,6 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const LeadsForm = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
@@ -27,7 +26,7 @@ const LeadsForm = () => {
         status,
         value: Number(value),
       };
-      await axios.post(`${API_URL}/api/leads`, lead, {
+      await axios.post("http://localhost:5000/api/leads", lead, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTitle("");

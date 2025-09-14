@@ -1,123 +1,150 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-const CustomerForm = () => {
+const ShowLeads = () => {
   const API_URL = process.env.REACT_APP_API_URL;
-  const { id } = useParams(); 
+  const { customerId } = useParams();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [company, setCompany] = useState("");
-  const [ownerId, setOwnerId] = useState("");
+
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const leadsPerPage = 5;
 
   useEffect(() => {
-    if (id) {
-      const fetchCustomer = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          const res = await axios.get(`${API_URL}/api/customers/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          const { name, email, phone, company, ownerId } = res.data;
-          setName(name);
-          setEmail(email);
-          setPhone(phone);
-          setCompany(company);
-          setOwnerId(ownerId);
-        } catch (err) {
-          console.error("Error fetching customer:", err);
+    const fetchLeads = async () => {
+      setError("");
+      setLoading(true);
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!API_URL) {
+          throw new Error("API_URL is not defined. Check your .env file.");
         }
-      };
-      fetchCustomer();
-    }
-  }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+        console.log("Fetching leads from:", `${API_URL}/api/leads/customer/${customerId}`);
 
-    const customer = { name, email, phone, company, ownerId };
-    const token = localStorage.getItem("token");
+        const res = await axios.get(
+          `${API_URL}/api/leads/customer/${customerId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-    try {
-      if (id) {
-        await axios.put(`${API_URL}/api/customers/${id}`, customer, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      } else {
-        await axios.post(`${API_URL}/api/customers`, customer, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        setLeads(res.data || []);
+      } catch (err) {
+        console.error("Error fetching leads:", err);
+        setError(err.response?.data?.message || "Failed to fetch leads");
+      } finally {
+        setLoading(false);
       }
-      setName("");
-      setEmail("");
-      setPhone("");
-      setCompany("");
-      setOwnerId("");
-      navigate("/showCustomers");
-    } catch (err) {
-      console.error("Error submitting form:", err.response?.data || err.message);
-    }
+    };
+
+    fetchLeads();
+  }, [customerId, API_URL]);
+
+  // Pagination calculations
+  const indexOfLastLead = currentPage * leadsPerPage;
+  const indexOfFirstLead = indexOfLastLead - leadsPerPage;
+  const currentLeads = leads.slice(indexOfFirstLead, indexOfLastLead);
+  const totalPages = Math.ceil(leads.length / leadsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  if (loading) return <p className="text-center">Loading leads...</p>;
+
   return (
-    <div className="flex justify-center items-center py-10 px-4 sm:px-6 lg:px-8">
-      <form
-        className="flex flex-col gap-3 w-full max-w-md"
-        onSubmit={handleSubmit}
-      >
-        <input
-          className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
-          type="text"
-          value={name}
-          placeholder="Enter Name"
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Leads for Customer ID: {customerId}
+      </h1>
 
-        <input
-          className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
-          type="email"
-          value={email}
-          placeholder="Enter Email"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      {error && (
+        <p className="text-red-500 text-center mb-4">{error}</p>
+      )}
 
-        <input
-          className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
-          type="text"
-          value={phone}
-          placeholder="Enter Phone no."
-          onChange={(e) => setPhone(e.target.value)}
-        />
+      {leads.length === 0 ? (
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No leads found.</p>
+          <button
+            onClick={() => navigate(`/leadform?customerId=${customerId}`)}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Add Lead
+          </button>
+        </div>
+      ) : (
+        <>
+          <ul className="space-y-4">
+            {currentLeads.map((lead) => (
+              <li
+                key={lead._id}
+                className="p-4 border rounded shadow bg-white"
+              >
+                <p>
+                  <span className="font-semibold">Title:</span>{" "}
+                  {lead.title || "N/A"}
+                </p>
+                <p>
+                  <span className="font-semibold">Description:</span>{" "}
+                  {lead.description || "N/A"}
+                </p>
+                <p>
+                  <span className="font-semibold">Status:</span>{" "}
+                  {lead.status || "N/A"}
+                </p>
+                <p>
+                  <span className="font-semibold">Value:</span>{" "}
+                  {lead.value || "N/A"}
+                </p>
+              </li>
+            ))}
+          </ul>
 
-        <input
-          className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
-          type="text"
-          value={company}
-          placeholder="Enter Company"
-          onChange={(e) => setCompany(e.target.value)}
-        />
+          {/* Pagination Controls */}
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
 
-        <input
-          className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
-          type="text"
-          value={ownerId}
-          placeholder="Enter Owner ID"
-          onChange={(e) => setOwnerId(e.target.value)}
-        />
-
-        <button
-          type="submit"
-          className="h-10 bg-lime-500 text-white font-bold rounded hover:bg-lime-600"
-        >
-          {id ? "Update Customer" : "Add Customer"}
-        </button>
-      </form>
+          {/* Add Lead Button */}
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => navigate(`/leadform?customerId=${customerId}`)}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              Add Lead
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
-export default CustomerForm;
+export default ShowLeads;

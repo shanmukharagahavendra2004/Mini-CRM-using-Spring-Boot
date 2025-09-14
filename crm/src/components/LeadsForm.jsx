@@ -27,17 +27,21 @@ const LeadsForm = () => {
         status,
         value: Number(value),
       };
+
       await axios.post(`${API_URL}/api/leads`, lead, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setTitle("");
       setDescription("");
       setStatus("New");
       setValue("");
+
+      // ✅ Navigate correctly to show-leads page
       if (customerId) {
-        navigate(`/showLeads/${customerId}`);
+       navigate(`/leads//${customerId}`);
       } else {
-        navigate("/showLeads");
+        navigate("/show-leads");
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -77,9 +81,6 @@ const LeadsForm = () => {
           onChange={(e) => setStatus(e.target.value)}
           required
         >
-          <option value="" disabled>
-            Select status
-          </option>
           <option value="New">New</option>
           <option value="Contacted">Contacted</option>
           <option value="Qualified">Qualified</option>

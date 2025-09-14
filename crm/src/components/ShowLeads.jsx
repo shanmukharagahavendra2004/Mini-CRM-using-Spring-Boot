@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 const CustomerForm = () => {
+  const API_URL = process.env.REACT_APP_API_URL;
   const { id } = useParams(); 
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -16,7 +17,7 @@ const CustomerForm = () => {
       const fetchCustomer = async () => {
         try {
           const token = localStorage.getItem("token");
-          const res = await axios.get(`http://localhost:5000/api/customers/${id}`, {
+          const res = await axios.get(`${API_URL}/api/customers/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const { name, email, phone, company, ownerId } = res.data;
@@ -41,11 +42,11 @@ const CustomerForm = () => {
 
     try {
       if (id) {
-        await axios.put(`http://localhost:5000/api/customers/${id}`, customer, {
+        await axios.put(`${API_URL}/api/customers/${id}`, customer, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        await axios.post("http://localhost:5000/api/customers", customer, {
+        await axios.post(`${API_URL}/api/customers`, customer, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }

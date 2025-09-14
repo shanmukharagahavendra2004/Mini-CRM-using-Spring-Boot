@@ -1,37 +1,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
 
 const CustomerForm = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
-  const { id } = useParams();
+  const { id } = useParams(); 
   const navigate = useNavigate();
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [ownerId, setOwnerId] = useState("");
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (id) {
       const fetchCustomer = async () => {
-        setError("");
         try {
           const token = localStorage.getItem("token");
-          const res = await axios.get(`${API_URL}/api/customers/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
+          const res = await axios.get(`http://localhost:5000/api/customers/${id}`, {
+            headers: { Authorization: `Bearer ${token}` }
           });
-          const customer = res.data;
-          setName(customer.name || "");
-          setEmail(customer.email || "");
-          setPhone(customer.phone || "");
-          setCompany(customer.company || "");
-          setOwnerId(customer.ownerId || "");
+          const { name, email, phone, company, ownerId } = res.data;
+          setName(name);
+          setEmail(email);
+          setPhone(phone);
+          setCompany(company);
+          setOwnerId(ownerId);
         } catch (err) {
-          setError(err.response?.data?.message || err.message);
+          console.error("Error fetching customer:", err);
         }
       };
       fetchCustomer();
@@ -40,30 +35,28 @@ const CustomerForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+
     const customer = { name, email, phone, company, ownerId };
     const token = localStorage.getItem("token");
 
     try {
       if (id) {
-        await axios.put(`${API_URL}/api/customers/${id}`, customer, {
-          headers: { Authorization: `Bearer ${token}` },
+        await axios.put(`http://localhost:5000/api/customers/${id}`, customer, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        alert("Customer updated successfully");
       } else {
-        await axios.post(`${API_URL}/api/customers`, customer, {
-          headers: { Authorization: `Bearer ${token}` },
+        await axios.post("http://localhost:5000/api/customers", customer, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        alert("Customer added successfully");
-        setName("");
-        setEmail("");
-        setPhone("");
-        setCompany("");
-        setOwnerId("");
       }
+      setName("");
+      setEmail("");
+      setPhone("");
+      setCompany("");
+      setOwnerId("");
       navigate("/showCustomers");
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      console.error("Error submitting form:", err.response?.data || err.message);
     }
   };
 
@@ -121,7 +114,6 @@ const CustomerForm = () => {
         >
           {id ? "Update Customer" : "Add Customer"}
         </button>
-        {error && <p className="text-red-600 mt-2">{error}</p>}
       </form>
     </div>
   );

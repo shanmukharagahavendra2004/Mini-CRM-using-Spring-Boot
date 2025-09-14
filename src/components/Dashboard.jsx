@@ -16,14 +16,13 @@ import {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const Dashboard = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
   const [statusData, setStatusData] = useState([]);
   const [valueData, setValueData] = useState([]);
 
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/leads`, {
+        const res = await axios.get("http://localhost:5000/api/leads", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
 

@@ -3,7 +3,6 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
 const ShowCustomers = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,7 +18,7 @@ const ShowCustomers = () => {
     setError("");
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API_URL}/api/customers`, {
+      const res = await axios.get("http://localhost:5000/api/customers", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCustomers(res.data);
@@ -52,7 +51,7 @@ const ShowCustomers = () => {
     setError("");
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/api/customers/${id}`, {
+      await axios.delete(`http://localhost:5000/api/customers/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCustomers(customers.filter((c) => c._id !== id));

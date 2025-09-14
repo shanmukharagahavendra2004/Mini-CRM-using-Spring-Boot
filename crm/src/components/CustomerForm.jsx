@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
-
 const CustomerForm = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const { id } = useParams();
@@ -12,7 +11,6 @@ const CustomerForm = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
-  const [ownerId, setOwnerId] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -29,7 +27,6 @@ const CustomerForm = () => {
           setEmail(customer.email || "");
           setPhone(customer.phone || "");
           setCompany(customer.company || "");
-          setOwnerId(customer.ownerId || "");
         } catch (err) {
           setError(err.response?.data?.message || err.message);
         }
@@ -41,27 +38,24 @@ const CustomerForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const customer = { name, email, phone, company, ownerId };
+
     const token = localStorage.getItem("token");
+    const customerData = { name, email, phone, company };
 
     try {
       if (id) {
-        await axios.put(`${API_URL}/api/customers/${id}`, customer, {
+        await axios.put(`${API_URL}/api/customers/${id}`, customerData, {
           headers: { Authorization: `Bearer ${token}` },
         });
         alert("Customer updated successfully");
       } else {
-        await axios.post(`${API_URL}/api/customers`, customer, {
+        await axios.post(`${API_URL}/api/customers`, customerData, {
           headers: { Authorization: `Bearer ${token}` },
         });
         alert("Customer added successfully");
-        setName("");
-        setEmail("");
-        setPhone("");
-        setCompany("");
-        setOwnerId("");
       }
-      navigate("/showCustomers");
+
+      navigate("/customers");
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     }
@@ -69,10 +63,7 @@ const CustomerForm = () => {
 
   return (
     <div className="flex justify-center items-center py-10 px-4 sm:px-6 lg:px-8">
-      <form
-        className="flex flex-col gap-3 w-full max-w-md"
-        onSubmit={handleSubmit}
-      >
+      <form className="flex flex-col gap-3 w-full max-w-md" onSubmit={handleSubmit}>
         <input
           className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
           type="text"
@@ -81,7 +72,6 @@ const CustomerForm = () => {
           onChange={(e) => setName(e.target.value)}
           required
         />
-
         <input
           className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
           type="email"
@@ -90,7 +80,6 @@ const CustomerForm = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-
         <input
           className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
           type="text"
@@ -98,21 +87,12 @@ const CustomerForm = () => {
           placeholder="Enter Phone no."
           onChange={(e) => setPhone(e.target.value)}
         />
-
         <input
           className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
           type="text"
           value={company}
           placeholder="Enter Company"
           onChange={(e) => setCompany(e.target.value)}
-        />
-
-        <input
-          className="outline-none border-2 border-black h-10 p-2 rounded focus:border-blue-500"
-          type="text"
-          value={ownerId}
-          placeholder="Enter Owner ID"
-          onChange={(e) => setOwnerId(e.target.value)}
         />
 
         <button

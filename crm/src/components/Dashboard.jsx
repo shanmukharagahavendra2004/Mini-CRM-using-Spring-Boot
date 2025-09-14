@@ -29,7 +29,7 @@ const Dashboard = () => {
 
         const leads = res.data;
 
-        // ✅ Group by status
+      
         const statusCounts = leads.reduce((acc, lead) => {
           acc[lead.status] = (acc[lead.status] || 0) + 1;
           return acc;
@@ -42,7 +42,7 @@ const Dashboard = () => {
           }))
         );
 
-        // ✅ Group by value
+   
         const valueCounts = leads.reduce((acc, lead) => {
           const val = lead.value || 0;
           acc[val] = (acc[val] || 0) + 1;
@@ -65,7 +65,6 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Pie chart by Status */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-xl font-semibold mb-4">Leads by Status</h2>
         <PieChart width={400} height={300}>
@@ -86,7 +85,6 @@ const Dashboard = () => {
         </PieChart>
       </div>
 
-      {/* Bar chart by Value */}
       <div className="bg-white shadow-md rounded-2xl p-4">
         <h2 className="text-xl font-semibold mb-4">Leads by Value</h2>
         <BarChart width={400} height={300} data={valueData}>

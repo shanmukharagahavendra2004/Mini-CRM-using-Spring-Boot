@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -73,3 +74,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 # Mini-CRM
 CRM Application (Full Stack MERN + JWT Auth + Dashboard)  This is a full-stack CRM (Customer Relationship Management) application built with the MERN stack (MongoDB, Express.js, React.js, Node.js). It allows users to register/login securely using JWT authentication and manage customers and their leads with CRUD operations.
 >>>>>>> d9d8b17ca22871dbb0b6de9aca0fc769de0b25f3
+=======
+# Mini-CRM-using-Spring-Boot
+Built a full-stack CRM application to manage customers, leads, and interactions. Developed secure, scalable RESTful APIs with Spring Boot and MongoDB, and created a responsive, user-friendly frontend using React.js and Tailwind CSS for efficient customer relationship management.
+>>>>>>> 105b88b224b18d065b39e0662c7e6d7e53d9f530
